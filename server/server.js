@@ -8,20 +8,19 @@ import jwt from "jsonwebtoken";
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// !!! ОБЯЗАТЕЛЬНО задай JWT_SECRET в Railway !!!
+// ---------- JWT ----------
 const JWT_SECRET = process.env.JWT_SECRET || "yernurIdea_30.11.25";
 const JWT_EXPIRES_IN = "7d";
 
-// ---------- MySQL config для Railway ----------
+// ---------- MySQL config (Railway + локалка) ----------
 const dbConfig = {
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
+  host: process.env.MYSQLHOST || "localhost",
+  user: process.env.MYSQLUSER || "root",
+  password: process.env.MYSQLPASSWORD || "",
+  database: process.env.MYSQLDATABASE || "quiz_db",
   port: process.env.MYSQLPORT ? Number(process.env.MYSQLPORT) : 3306,
-  charset: "utf8mb4"
+  charset: "utf8mb4",
 };
-
 
 let pool;
 
@@ -31,33 +30,52 @@ async function initDb() {
     pool = await mysql.createPool(dbConfig);
     console.log("MySQL pool created");
 
-    // тестовый запрос
     const [rows] = await pool.query("SELECT 1 AS t");
     console.log("DB test result:", rows[0]);
   } catch (err) {
     console.error("MySQL connection error:", err);
-    process.exit(1); // на Railway перезапустится
+    process.exit(1);
   }
 }
 
 await initDb();
 
-// ---------- MIDDLEWARE ----------
+// ---------- CORS ----------
+const allowedOrigins = [
+  "http://localhost:5173",       // dev
+  "https://lwcard.netlify.app",  // продовый фронт
+];
+
 app.use(
   cors({
-    origin: "*", // хочешь — можешь указать Netlify-URL
+    origin(origin, callback) {
+      // запросы без Origin (Postman, curl) – позволяем
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     methods: ["GET", "POST", "PATCH", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+// отвечаем на preflight
+app.options("*", cors());
+
 app.use(express.json());
 
-// health-check для проверки сервера
-app.get("/api/health", (req, res) => {
-  res.json({ status: "ok" });
+// ---------- health-check ----------
+app.get("/", (req, res) => {
+  res.json({ status: "ok", path: "/" });
 });
 
-// ---------- JWT ----------
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", path: "/api/health" });
+});
+
+// ---------- JWT helpers ----------
 function createToken(userId) {
   return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
 }
@@ -80,6 +98,8 @@ function authMiddleware(req, res, next) {
 }
 
 // ---------- AUTH ----------
+
+// регистрация
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -108,7 +128,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     return res.status(201).json({
       token,
-      user: { id: result.insertId, email }
+      user: { id: result.insertId, email },
     });
   } catch (err) {
     console.error("Register error:", err);
@@ -116,6 +136,7 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
+// логин
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -156,10 +177,10 @@ app.post("/api/quizzes", authMiddleware, async (req, res) => {
     }
 
     const cleaned = cards
-      .filter(c => c.question && c.answer)
-      .map(c => ({
+      .filter((c) => c.question && c.answer)
+      .map((c) => ({
         question: String(c.question),
-        answer: String(c.answer)
+        answer: String(c.answer),
       }));
 
     const json = JSON.stringify(cleaned);
@@ -173,7 +194,7 @@ app.post("/api/quizzes", authMiddleware, async (req, res) => {
       id: result.insertId,
       title,
       cards: cleaned,
-      is_public: isPublic ? 1 : 0
+      is_public: isPublic ? 1 : 0,
     });
   } catch (err) {
     console.error("Create quiz error:", err);
@@ -220,7 +241,7 @@ app.get("/api/quizzes/:id", authMiddleware, async (req, res) => {
       title: quiz.title,
       created_at: quiz.created_at,
       is_public: quiz.is_public === 1,
-      cards
+      cards,
     });
   } catch (err) {
     console.error("Get quiz error:", err);
@@ -281,7 +302,7 @@ app.get("/api/public/quizzes/:id", async (req, res) => {
       id: quiz.id,
       title: quiz.title,
       created_at: quiz.created_at,
-      cards
+      cards,
     });
   } catch (err) {
     console.error("Public quiz error:", err);
@@ -289,6 +310,7 @@ app.get("/api/public/quizzes/:id", async (req, res) => {
   }
 });
 
+// ---------- старт сервера ----------
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
