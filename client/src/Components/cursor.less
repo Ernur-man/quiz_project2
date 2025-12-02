@@ -1,0 +1,17 @@
+.cursor-seg.styled {
+  position: fixed;
+  pointer-events: none;
+  border-radius: 999px;   // круглая форма
+  z-index: 9999;
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  transition: opacity 0.4s ease-out;
+}
+
+@media (max-width: 768px) {
+  .cursor-seg.styled { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-seg.styled { display: none; }
+}

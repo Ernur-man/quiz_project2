@@ -1,0 +1,142 @@
+// src/Pages/FeedbackPage/feedback.less
+.feedback-page {
+  min-height: 100vh;
+  background: #1f1f27;
+  padding: 60px 40px 40px;
+  padding-left: 90px;
+  color: #ffffff;
+  font-family: "Poppins", system-ui, sans-serif;
+  display: flex;
+  justify-content: center;
+
+  .feedback-container {
+    width: 100%;
+    max-width: 800px;
+  }
+
+  h2 {
+    font-size: 28px;
+    margin-bottom: 6px;
+  }
+
+  .feedback-sub {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 18px;
+  }
+
+  .feedback-card {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 20px;
+    padding: 22px 24px 24px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .row {
+    label {
+      display: block;
+      font-size: 13px;
+      margin-bottom: 4px;
+      opacity: 0.9;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      padding: 9px 11px;
+      font-size: 14px;
+      background: #ffffff;
+      color: #222129;
+      resize: vertical;
+    }
+  }
+
+  .row-inline {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .feedback-btn {
+    margin-top: 4px;
+    align-self: flex-start;
+    padding: 9px 18px;
+    border-radius: 10px;
+    border: none;
+    background: #8c5bff;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.1s ease,
+      box-shadow 0.15s ease;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+  }
+
+  .feedback-status {
+    margin-top: 8px;
+    font-size: 13px;
+
+    &.success {
+      color: #34c759;
+    }
+
+    &.error {
+      color: #ff6b6b;
+    }
+  }
+}
+
+/* 📱 адаптация */
+@media (max-width: 768px) {
+  .feedback-page {
+    padding: 60px 18px 24px;
+    padding-left: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedback-page {
+    padding: 56px 12px 20px;
+    padding-left: 66px;
+
+    h2 {
+      font-size: 24px;
+    }
+
+    .feedback-sub {
+      font-size: 13px;
+    }
+
+    .feedback-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}

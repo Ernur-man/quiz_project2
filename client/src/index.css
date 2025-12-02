@@ -1,0 +1,5 @@
+@import './reset.less';
+
+html{
+    scroll-behavior: smooth;
+}

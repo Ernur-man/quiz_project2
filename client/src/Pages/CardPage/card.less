@@ -1,0 +1,223 @@
+.card-page {
+  min-height: 100vh;
+  background: #1f1f27;
+  padding: 60px 40px 40px;
+  padding-left: 90px;
+  display: flex;
+  justify-content: center;
+  color: #ffffff;
+  font-family: "Poppins", system-ui, sans-serif;
+}
+
+.card-container {
+  width: 100%;
+  max-width: 1100px;
+}
+
+.card-header {
+  margin-bottom: 26px;
+
+  h2 {
+    font-size: 30px;
+    margin-bottom: 6px;
+  }
+
+  .card-sub {
+    font-size: 14px;
+    opacity: 0.8;
+  }
+
+  .card-visibility {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 999px;
+    padding: 6px 10px;
+  }
+
+  .vis-label {
+    font-size: 13px;
+    opacity: 0.6;
+
+    &.active {
+      opacity: 1;
+      font-weight: 600;
+    }
+  }
+
+  .vis-switch {
+    width: 40px;
+    height: 22px;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 0;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.15s ease;
+
+    .thumb {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #ffffff;
+      transition: transform 0.2s ease;
+    }
+
+    &.on {
+      background: #8c5bff;
+
+      .thumb {
+        transform: translateX(18px);
+      }
+    }
+  }
+
+  .card-vis-note {
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.7;
+  }
+}
+
+.card-form-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 20px;
+  padding: 22px 24px 26px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.5);
+}
+
+.card-title-row {
+  margin-bottom: 18px;
+
+  input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #ffffff;
+    color: #222129;
+    font-size: 15px;
+  }
+}
+
+.card-block {
+  margin-bottom: 18px;
+
+  .card-question-label {
+    font-size: 14px;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+
+  .card-row {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 10px;
+  }
+
+  .question-input,
+  .answer-input {
+    width: 100%;
+    padding: 9px 11px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #ffffff;
+    color: #222129;
+    font-size: 14px;
+  }
+}
+
+.card-buttons {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn {
+  border-radius: 10px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease,
+    box-shadow 0.15s ease;
+
+  &.primary {
+    background: #8c5bff;
+    color: #ffffff;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.45);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+      box-shadow: none;
+    }
+  }
+
+  &.secondary {
+    background: #ffffff;
+    color: #222129;
+
+    &:hover {
+      background: #f1f1f7;
+    }
+  }
+}
+
+.card-message {
+  margin-top: 12px;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* 📱 адаптация */
+@media (max-width: 900px) {
+  .card-page {
+    padding: 60px 18px 24px;
+    padding-left: 70px;
+  }
+
+  .card-block .card-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-page {
+    padding: 56px 12px 20px;
+    padding-left: 66px;
+  }
+
+  .card-header h2 {
+    font-size: 24px;
+  }
+
+  .card-header .card-sub {
+    font-size: 13px;
+  }
+
+  .card-buttons {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
