@@ -9,7 +9,7 @@ import CreatedCards from "./Pages/CreatedCards/CreatedCards";
 import QuizPage from "./Pages/QuizPage/quizPage";
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage";
-import FeedbackPage from "./Pages/FeedbackPages/FeedbackPages.jsx";
+import FeedbackPage from "./Pages/FeedBackPages/FeedBackPages.jsx";
 
 import Header from "./Components/header";
 import CursorTrailStyled from "./Components/cursorFollow";
