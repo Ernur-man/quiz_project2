@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 const JWT_SECRET = process.env.JWT_SECRET || "yernurIdea_30.11.25";
 const JWT_EXPIRES_IN = "7d";
 
-// ---------- MySQL config (Railway + локалка) ----------
+// ---------- MySQL config ----------
 const dbConfig = {
   host: process.env.MYSQLHOST || "localhost",
   user: process.env.MYSQLUSER || "root",
@@ -25,61 +25,16 @@ const dbConfig = {
 
 let pool;
 
-// инициализация пула
-async function initDb() {
-  try {
-    pool = await mysql.createPool(dbConfig);
-    console.log("MySQL pool created");
-
-    const [rows] = await pool.query("SELECT 1 AS t");
-    console.log("DB test result:", rows[0]);
-  } catch (err) {
-    console.error("MySQL connection error:", err);
-    process.exit(1);
-  }
-}
-
-await initDb();
-
-// ---------- CORS ----------
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://dancing-cascaron-8ee893.netlify.app",
-];
-
-// сначала базовый middleware CORS
+// ---------- MIDDLEWARE ----------
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // запросы из Postman/Node без origin — пропускаем
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.includes(origin)) return callback(null, true);
-      return callback(new Error("Not allowed by CORS"));
-    },
+    origin: "*",
     methods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
+app.options("*", cors());
 
-// затем — ручная простая прокладка, чтобы заголовки были ДАЖЕ при 404/500
-app.use((req, res, next) => {
-  const origin = req.headers.origin;
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.header("Access-Control-Allow-Origin", origin || "*");
-  }
-  res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(204);
-  }
-  next();
-});
-
-// парсер JSON
 app.use(express.json());
 
 // ---------- health-check ----------
@@ -114,8 +69,6 @@ function authMiddleware(req, res, next) {
 }
 
 // ---------- AUTH ----------
-
-// регистрация
 app.post("/api/auth/register", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -152,7 +105,6 @@ app.post("/api/auth/register", async (req, res) => {
   }
 });
 
-// логин
 app.post("/api/auth/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -180,8 +132,6 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 // ---------- QUIZZES ----------
-
-// создать квиз
 app.post("/api/quizzes", authMiddleware, async (req, res) => {
   try {
     const { title, cards, isPublic } = req.body;
@@ -218,7 +168,6 @@ app.post("/api/quizzes", authMiddleware, async (req, res) => {
   }
 });
 
-// список квизов текущего пользователя
 app.get("/api/quizzes", authMiddleware, async (req, res) => {
   try {
     const [rows] = await pool.execute(
@@ -232,7 +181,6 @@ app.get("/api/quizzes", authMiddleware, async (req, res) => {
   }
 });
 
-// один квиз (для владельца)
 app.get("/api/quizzes/:id", authMiddleware, async (req, res) => {
   try {
     const quizId = req.params.id;
@@ -265,7 +213,6 @@ app.get("/api/quizzes/:id", authMiddleware, async (req, res) => {
   }
 });
 
-// смена public/private
 app.patch("/api/quizzes/:id/visibility", authMiddleware, async (req, res) => {
   try {
     const quizId = req.params.id;
@@ -295,7 +242,6 @@ app.patch("/api/quizzes/:id/visibility", authMiddleware, async (req, res) => {
   }
 });
 
-// публичный просмотр по ссылке
 app.get("/api/public/quizzes/:id", async (req, res) => {
   try {
     const quizId = req.params.id;
@@ -326,9 +272,19 @@ app.get("/api/public/quizzes/:id", async (req, res) => {
   }
 });
 
-// ---------- старт сервера ----------
-app.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// ---------- запуск сервера + подключение к БД ----------
+(async () => {
+  try {
+    pool = await mysql.createPool(dbConfig);
+    console.log("MySQL pool created");
+    const [rows] = await pool.query("SELECT 1 AS t");
+    console.log("DB test result:", rows[0]);
+  } catch (err) {
+    console.error("MySQL connection error:", err);
+    // сервер всё равно стартанёт, просто все запросы к БД будут падать
+  }
 
-export default app;
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+})();
