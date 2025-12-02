@@ -4,6 +4,7 @@ import cors from "cors";
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -41,25 +42,44 @@ async function initDb() {
 await initDb();
 
 // ---------- CORS ----------
+
 const allowedOrigins = [
-  "http://localhost:5173",       // dev
-  "https://dancing-cascaron-8ee893.netlify.app", // ТВОЙ ТЕКУЩИЙ Netlify-сайт
+  "http://localhost:5173",
+  "https://dancing-cascaron-8ee893.netlify.app",
 ];
 
-// ---------- MIDDLEWARE ----------
-
-// максимально простой CORS – разрешаем всем
+// сначала базовый middleware CORS
 app.use(
   cors({
-    origin: "*",
+    origin: (origin, callback) => {
+      // запросы из Postman/Node без origin — пропускаем
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      return callback(new Error("Not allowed by CORS"));
+    },
     methods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 
-// чтобы preflight OPTIONS тоже проходили
-app.options("*", cors());
+// затем — ручная простая прокладка, чтобы заголовки были ДАЖЕ при 404/500
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header("Access-Control-Allow-Origin", origin || "*");
+  }
+  res.header("Access-Control-Allow-Methods", "GET,POST,PATCH,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
 
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+// парсер JSON
 app.use(express.json());
 
 // ---------- health-check ----------
@@ -307,6 +327,8 @@ app.get("/api/public/quizzes/:id", async (req, res) => {
 });
 
 // ---------- старт сервера ----------
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+export default app;
