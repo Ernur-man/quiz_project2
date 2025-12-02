@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider } from "./Context/AuthContext";
 
 import HomePage from "./Pages/HomePage/HomePage";
 import CardPage from "./Pages/CardPage/CardPage";
