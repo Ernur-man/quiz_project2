@@ -6,10 +6,10 @@ import { AuthProvider } from "./context/AuthContext";
 import HomePage from "./Pages/HomePage/HomePage";
 import CardPage from "./Pages/CardPage/CardPage";
 import CreatedCards from "./Pages/CreatedCards/CreatedCards";
-import QuizPage from "./Pages/QuizPage/QuizPage";
+import QuizPage from "./Pages/QuizPage/quizPage";
 import LoginPage from "./Pages/LoginPage/LoginPage";
 import RegisterPage from "./Pages/RegisterPage/RegisterPage";
-import FeedbackPage from "./Pages/FeedbackPages/FeedbackPages";
+import FeedbackPage from "./Pages/FeedbackPages/FeedbackPages.jsx";
 
 import Header from "./Components/header";
 import CursorTrailStyled from "./Components/cursorFollow";
