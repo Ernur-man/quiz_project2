@@ -46,22 +46,18 @@ const allowedOrigins = [
   "https://dancing-cascaron-8ee893.netlify.app", // ТВОЙ ТЕКУЩИЙ Netlify-сайт
 ];
 
+// ---------- MIDDLEWARE ----------
+
+// максимально простой CORS – разрешаем всем
 app.use(
   cors({
-    origin(origin, callback) {
-      // запросы без Origin (Postman, curl) – позволяем
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: "*",
     methods: ["GET", "POST", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
-// отвечаем на preflight
+// чтобы preflight OPTIONS тоже проходили
 app.options("*", cors());
 
 app.use(express.json());
