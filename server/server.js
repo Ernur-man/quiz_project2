@@ -43,7 +43,7 @@ await initDb();
 // ---------- CORS ----------
 const allowedOrigins = [
   "http://localhost:5173",       // dev
-  "https://lwcard.netlify.app",  // продовый фронт
+  "https://dancing-cascaron-8ee893.netlify.app", // ТВОЙ ТЕКУЩИЙ Netlify-сайт
 ];
 
 app.use(
